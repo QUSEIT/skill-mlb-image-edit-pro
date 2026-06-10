@@ -184,11 +184,12 @@ from dotenv import load_dotenv
 load_dotenv("/config/.hermes/.env", override=False)
 ```
 
-### ⚠️ PIL 环境
-`/opt/hermes/.venv/bin/python` 没有 PIL，需用 uv：
+### ⚠️ PIL + dotenv 环境
+`/opt/hermes/.venv/bin/python` 没有 PIL，**也没有 python-dotenv**。必须用 uv 并指定两个包：
 ```bash
-uv run --with Pillow python3 your_script.py
+uv run --with Pillow,python-dotenv python3 your_script.py
 ```
+单独 `--with Pillow` 会报 `ModuleNotFoundError: No module named 'dotenv'`。
 
 ### ⚠️ 生成后必须发回调用出处
 **图片生成后不要只保存本地，必须通过 MEDIA: 路径发回给调用者。**
@@ -198,6 +199,44 @@ uv run --with Pillow python3 your_script.py
 
 由 Hermes Agent 根据当前会话上下文（chat_id）自动路由，无需在技能说明里指定固定 chat_id。
 
+### ⚠️ OpenClaw 风格封面图 Prompt 模板（已验证）
+
+当创作 OpenClaw 风格公众号封面图时，使用以下 Prompt 结构（基于三次成功生成经验）：
+
+```python
+prompt = """Transform this illustration into a flat vector cover illustration for an article about '[文章标题/主题]'. Create a concept illustration showing: [具体视觉元素描述——编排节点 + 并行代理网络 + 对抗性验证等核心概念]. The composition should convey [scale/control/verification 等核心信息]. Use OpenClaw warm coral-orange gradient vector style with transparent background, dynamic energy, 16:9 aspect ratio."""
+```
+
+**关键要素**：
+- 明确提及 "flat vector cover illustration"
+- 明确提及 "OpenClaw warm coral-orange gradient vector style with transparent background"
+- 明确提及 "16:9 aspect ratio"（公众号封面标准比例）
+- 视觉概念要具体：中央编排节点、并行代理流、对抗性验证对峙等
+- 避免过于抽象的概念描述，模型更喜欢可视觉化的具象指令
+
+### ⚠️ AIPY 人物设计铁律（用户强偏好）
+**禁止**：光头圆球、无发线、火柴人棍状身体、纯两点一眼一嘴的极简五官。
+**必须**：简洁发线 + 圆润头部 + 小鼻子 + 小弧线眉毛 + 小弧线嘴 + 干净身形。
+完整规范见 `references/aipy-comic-style.md`，生成 AIPY 内容前必读该文件。
+
+### ⚠️ OpenClaw 风格支持
+当用户明确说「openclaw」/「OpenClaw」/「爪子风格」时，使用 OpenClaw 矢量渐变风格：
+- **主体色**：暖珊瑚橙（`#F8704B` 主填充）+ 同色系渐变（高光 `#FFC8AA`，暗部 `#3C3230`）
+- **背景/辅助色**：可使用黑白灰等中性色（`#FFFFFF`/`#F5F5F5`/`#9E9E9E`/`#1A1A1A`）
+- **灵活背景**：可使用透明背景、纯白、浅灰或深灰背景
+- 无描边，色块明暗交界形成轮廓
+- **主体必须用暖珊瑚橙，背景可用中性色** — 不再强制所有元素同色系
+- 完整规范见 `references/clawclass-style.md`
+- 参考图：`/config/Desktop/cwr/images/clawclass_style.png`
+
+### ⚠️ SilkRoad 风格支持
+当用户明确说「silkroad」/「SilkRoad」/「丝路风格」时，使用 SilkRoad 扁平色块风格：
+- 琥珀金主导 + 高饱和亮色点缀（蓝/红/绿）
+- 透明背景（PNG alpha）
+- 纯平涂色块，无渐变、无阴影、无描边
+- 完整规范见 `references/silkroad-style.md`
+- 参考图：`/config/Desktop/cwr/images/silkroad_style.png`
+
 ### ⚠️ 脚本路径注意
 `mlb_image_edit_pro.py` 位于技能目录内（`/config/.hermes/skills/image-generation/mlb-image-edit-pro/scripts/`），**不在 `/config/Desktop/cwr/scripts/` 下**。使用时需要：
 - 直接复制到工作目录：`cp /config/.hermes/skills/image-generation/mlb-image-edit-pro/scripts/mlb_image_edit_pro.py /config/Desktop/cwr/scripts/`
@@ -205,9 +244,13 @@ uv run --with Pillow python3 your_script.py
 
 ---
 
-## 设计资源
+**设计资源**
 
 **AIPY 漫画风格规范**: `references/aipy-comic-style.md` — AIPY 课程/营销内容的极简线稿漫画风格定义，基于 Nano Banana Pro 的 8 格对比漫画风格。包含严格的色彩系统（灰黑线条+奶油底色+黄色强调）、线条规范、人物设计和构图原则。适用于为 AIPY 文章生成统一风格的插画和封面。
+
+**OpenClaw 矢量渐变风格规范**: `references/clawclass-style.md` — 暖珊瑚橙主体色 + 中性色背景，灵活配色矢量插画风格，无描边，现代扁平感。当用户指定「openclaw」风格时启用。参考图：`/config/Desktop/cwr/images/clawclass_style.png`。
+
+**SilkRoad 扁平色块风格规范**: `references/silkroad-style.md` — 琥珀金主导 + 高饱和亮色点缀（蓝/红/绿）的扁平矢量插画风格，透明背景，纯平涂色块，无渐变无阴影。当用户指定「silkroad」风格时启用。参考图：`/config/Desktop/cwr/images/silkroad_style.png`。
 
 **参考脚本**: `scripts/mlb_image_edit_pro.py`（位于技能目录下，非 `/config/Desktop/cwr/scripts/`）
 
@@ -226,9 +269,9 @@ cd /config/Desktop/cwr && uv run --with Pillow python3 scripts/mlb_image_edit_pr
 cd /config/Desktop/cwr && uv run --with Pillow python3 scripts/mlb_image_edit_pro.py edit \
   -p "Transform into an oil painting style, keep facial features exact" \
   -i /path/to/portrait.png --resolution 2K
-
-# 多参考图合成
+```bash
+# SilkRoad 风格 — 琥珀金扁平色块
 cd /config/Desktop/cwr && uv run --with Pillow python3 scripts/mlb_image_edit_pro.py edit \
-  -p "Place this character in this scene with this lighting" \
-  -i /path/to/char.png /path/to/scene.jpg /path/to/lighting.jpg
+  -p "Flat vector illustration with amber gold color blocks and bright accent colors" \
+  -i /config/Desktop/cwr/images/silkroad_style.png --resolution 2K
 ```

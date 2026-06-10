@@ -32,7 +32,7 @@
 ## 人物设计
 
 - **头部**：简单圆圈，无复杂发型
-- **身体**：火柴人/细线条身体，极简
+- **身体**：细线条身体，极简
 - **五官**：两点作眼，小弧线作嘴，无鼻子
 - **动态**：通过肢体角度表达情绪，不依赖面部表情
 
@@ -70,7 +70,7 @@
 ```
 A wide-format cover illustration for a tech education article.
 Style: Ultra-thin gray-black pen lines (#4A4A4A) on cream background (#F5F0E8) with subtle faint dot-grid texture. EXTREMELY minimal, like architectural blueprint sketches.
-Characters: simple circle heads, thin stick bodies, tiny dot eyes, small arc mouths.
+Characters: simple circle heads, minimal thin-line bodies, tiny dot eyes, small arc mouths.
 
 Color palette (STRICT):
 - Gray-black lines (#4A4A4A) for all outlines, characters, borders
